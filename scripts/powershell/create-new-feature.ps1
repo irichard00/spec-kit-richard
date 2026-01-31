@@ -241,14 +241,12 @@ if ($branchName.Length -gt $maxBranchLength) {
     Write-Warning "[specify] Truncated to: $branchName ($($branchName.Length) bytes)"
 }
 
+# Branch creation has been moved to /rr.implement
+# This script now only creates the spec folder structure
 if ($hasGit) {
-    try {
-        git checkout -b $branchName | Out-Null
-    } catch {
-        Write-Warning "Failed to create git branch: $branchName"
-    }
+    Write-Host "[specify] Spec folder will be created. Use /rr.implement to create branch and start implementation." -ForegroundColor Cyan
 } else {
-    Write-Warning "[specify] Warning: Git repository not detected; skipped branch creation for $branchName"
+    Write-Warning "[specify] Warning: Git repository not detected."
 }
 
 $featureDir = Join-Path $specsDir $branchName
@@ -266,18 +264,17 @@ if (Test-Path $template) {
 $env:SPECIFY_FEATURE = $branchName
 
 if ($Json) {
-    $obj = [PSCustomObject]@{ 
-        BRANCH_NAME = $branchName
+    $obj = [PSCustomObject]@{
+        FOLDER_NAME = $branchName
         SPEC_FILE = $specFile
         FEATURE_NUM = $featureNum
-        HAS_GIT = $hasGit
     }
     $obj | ConvertTo-Json -Compress
 } else {
-    Write-Output "BRANCH_NAME: $branchName"
+    Write-Output "FOLDER_NAME: $branchName"
     Write-Output "SPEC_FILE: $specFile"
     Write-Output "FEATURE_NUM: $featureNum"
-    Write-Output "HAS_GIT: $hasGit"
-    Write-Output "SPECIFY_FEATURE environment variable set to: $branchName"
+    Write-Output ""
+    Write-Output "Next step: Run /rr.implement to create branch and start implementation."
 }
 
