@@ -1,19 +1,19 @@
 <div align="center">
     <img src="./media/logo_large.webp" alt="Spec Kit Logo" width="200" height="200"/>
-    <h1>🌱 Spec Kit</h1>
+    <h1>🌱 Spec Kit (RR Fork)</h1>
     <h3><em>Build high-quality software faster.</em></h3>
 </div>
 
 <p align="center">
-    <strong>An open source toolkit that allows you to focus on product scenarios and predictable outcomes instead of vibe coding every piece from scratch.</strong>
+    <strong>A customized fork of <a href="https://github.com/github/spec-kit">github/spec-kit</a> with enhanced workflow controls.</strong>
 </p>
 
-<p align="center">
-    <a href="https://github.com/github/spec-kit/actions/workflows/release.yml"><img src="https://github.com/github/spec-kit/actions/workflows/release.yml/badge.svg" alt="Release"/></a>
-    <a href="https://github.com/github/spec-kit/stargazers"><img src="https://img.shields.io/github/stars/github/spec-kit?style=social" alt="GitHub stars"/></a>
-    <a href="https://github.com/github/spec-kit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/github/spec-kit" alt="License"/></a>
-    <a href="https://github.github.io/spec-kit/"><img src="https://img.shields.io/badge/docs-GitHub_Pages-blue" alt="Documentation"/></a>
-</p>
+> **Fork Changes:**
+> - Command prefix changed from `/speckit.*` to `/rr.*`
+> - Branch creation moved from `/rr.specify` to `/rr.implement` (specify stays on current branch)
+> - Added folder selection UI to `/rr.implement`
+> - Added completion status marking (`DONE-` / `FAILED-` folder prefixes)
+> - Added new `/rr.implement_all` command for batch processing multiple specs
 
 ---
 
@@ -51,7 +51,7 @@ Choose your preferred installation method:
 Install once and use everywhere:
 
 ```bash
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+uv tool install specify-cli --from git+https://github.com/user/spec-kit-richard.git
 ```
 
 Then use the tool directly:
@@ -72,7 +72,7 @@ specify check
 To upgrade Specify, see the [Upgrade Guide](./docs/upgrade.md) for detailed instructions. Quick upgrade:
 
 ```bash
-uv tool install specify-cli --force --from git+https://github.com/github/spec-kit.git
+uv tool install specify-cli --force --from git+https://github.com/user/spec-kit-richard.git
 ```
 
 #### Option 2: One-time Usage
@@ -80,7 +80,7 @@ uv tool install specify-cli --force --from git+https://github.com/github/spec-ki
 Run directly without installing:
 
 ```bash
-uvx --from git+https://github.com/github/spec-kit.git specify init <PROJECT_NAME>
+uvx --from git+https://github.com/user/spec-kit-richard.git specify init <PROJECT_NAME>
 ```
 
 **Benefits of persistent installation:**
@@ -126,11 +126,31 @@ Use **`/rr.tasks`** to create an actionable task list from your implementation p
 
 ### 6. Execute implementation
 
-Use **`/rr.implement`** to execute all tasks and build your feature according to the plan.
+Use **`/rr.implement`** to select a spec folder, create the git branch, and execute all tasks.
 
 ```bash
 /rr.implement
 ```
+
+The command will:
+1. List available spec folders for you to choose from
+2. Create and checkout a git branch for the selected folder
+3. Execute all tasks from `tasks.md`
+4. Mark the folder as `DONE-` or `FAILED-` when complete
+
+### 7. Batch implementation (optional)
+
+Use **`/rr.implement_all`** to process all spec folders sequentially:
+
+```bash
+/rr.implement_all
+```
+
+This will automatically:
+- Process each spec folder in order
+- Create branch, implement, commit, and push for each
+- Mark folders as `DONE-` or `FAILED-`
+- Continue to the next folder
 
 For detailed step-by-step instructions, see our [comprehensive guide](./spec-driven.md).
 
@@ -256,7 +276,8 @@ Essential commands for the Spec-Driven Development workflow:
 | `/rr.specify`      | Define what you want to build (requirements and user stories)            |
 | `/rr.plan`         | Create technical implementation plans with your chosen tech stack        |
 | `/rr.tasks`        | Generate actionable task lists for implementation                        |
-| `/rr.implement`    | Execute all tasks to build the feature according to the plan             |
+| `/rr.implement`    | Select a spec folder, create branch, execute tasks, mark completion      |
+| `/rr.implement_all`| Batch process all spec folders sequentially with commit/push             |
 
 #### Optional Commands
 
@@ -433,7 +454,7 @@ delete any comments that you made, but you can't delete comments anybody else ma
 
 After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process. Claude Code will also trigger some of the built-in scripts to set up the repository.
 
-Once this step is completed, you should have a new branch created (e.g., `001-create-taskify`), as well as a new specification in the `specs/001-create-taskify` directory.
+Once this step is completed, you should have a new specification folder created in `specs/001-create-taskify`. Note: In this fork, the git branch is **not** created at this stage - it will be created when you run `/rr.implement`.
 
 The produced specification should contain a set of user stories and functional requirements, as defined in the template.
 
@@ -602,11 +623,21 @@ Once ready, use the `/rr.implement` command to execute your implementation plan:
 
 The `/rr.implement` command will:
 
-- Validate that all prerequisites are in place (constitution, spec, plan, and tasks)
-- Parse the task breakdown from `tasks.md`
-- Execute tasks in the correct order, respecting dependencies and parallel execution markers
-- Follow the TDD approach defined in your task plan
-- Provide progress updates and handle errors appropriately
+1. **List available spec folders** - Shows all specs ready for implementation
+2. **Create git branch** - Creates and checks out a branch named after the selected folder
+3. **Validate prerequisites** - Ensures constitution, spec, plan, and tasks are in place
+4. **Execute tasks** - Runs tasks in order, respecting dependencies and parallel markers
+5. **Mark completion** - Renames folder with `DONE-` or `FAILED-` prefix when finished
+
+#### Batch Implementation
+
+To process **all** spec folders automatically, use:
+
+```text
+/rr.implement_all
+```
+
+This will sequentially process each folder: create branch → implement → commit → push → mark status → next folder.
 
 > [!IMPORTANT]
 > The AI agent will execute local CLI commands (such as `dotnet`, `npm`, etc.) - make sure you have the required tools installed on your machine.
@@ -638,12 +669,18 @@ rm gcm-linux_amd64.2.6.1.deb
 
 ## 👥 Maintainers
 
+**Fork maintainer:**
+- Richard
+
+**Original project maintainers:**
 - Den Delimarsky ([@localden](https://github.com/localden))
 - John Lam ([@jflam](https://github.com/jflam))
 
 ## 💬 Support
 
-For support, please open a [GitHub issue](https://github.com/github/spec-kit/issues/new). We welcome bug reports, feature requests, and questions about using Spec-Driven Development.
+For issues specific to this fork, please open an issue in this repository.
+
+For the original Spec Kit project, visit [github/spec-kit](https://github.com/github/spec-kit/issues/new).
 
 ## 🙏 Acknowledgements
 
