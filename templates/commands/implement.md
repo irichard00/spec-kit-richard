@@ -172,9 +172,34 @@ Implementation execution rules:
 - Validate that tests pass and coverage meets requirements
 - Confirm the implementation follows the technical plan
 
-### Step 9: Mark Completion Status
+### Step 9: Commit and Push
 
-After all tasks are processed:
+After implementation is complete (or partially complete), commit and push all changes:
+
+1. **Stage all changes**:
+   ```bash
+   git add -A
+   ```
+
+2. **Commit with descriptive message**:
+   ```bash
+   git commit -m "feat(<folder-name>): implement <feature-description>
+
+   Implemented tasks from specs/<folder-name>/tasks.md
+
+   Co-Authored-By: Claude <noreply@anthropic.com>"
+   ```
+
+3. **Push to remote**:
+   ```bash
+   git push -u origin <branch-name>
+   ```
+
+**If push fails**: Retry once. If still failing, warn user that changes are committed locally but not pushed.
+
+### Step 10: Mark Completion Status
+
+After commit and push:
 
 **If all tasks completed successfully:**
 1. Run `{MARK_SCRIPT} --folder <folder-name> --status DONE`
@@ -188,6 +213,7 @@ After all tasks are processed:
 Report final status with:
 - Summary of completed work
 - Branch name for reference
+- Remote URL (if pushed successfully)
 - New folder name (with DONE- or FAILED- prefix)
 
 ---
