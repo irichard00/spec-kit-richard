@@ -51,7 +51,7 @@ Choose your preferred installation method:
 Install once and use everywhere:
 
 ```bash
-uv tool install specify-cli --from git+https://github.com/user/spec-kit-richard.git
+uv tool install specify-cli --from git+https://github.com/irichard00/spec-kit-richard
 ```
 
 Then use the tool directly:
