@@ -72,7 +72,7 @@ specify check
 To upgrade Specify, see the [Upgrade Guide](./docs/upgrade.md) for detailed instructions. Quick upgrade:
 
 ```bash
-uv tool install specify-cli --force --from git+https://github.com/user/spec-kit-richard.git
+uv tool install specify-cli --force --from git+https://github.com/irichard00/spec-kit-richard.git
 ```
 
 #### Option 2: One-time Usage
@@ -80,7 +80,7 @@ uv tool install specify-cli --force --from git+https://github.com/user/spec-kit-
 Run directly without installing:
 
 ```bash
-uvx --from git+https://github.com/user/spec-kit-richard.git specify init <PROJECT_NAME>
+uvx --from git+https://github.com/irichard00/spec-kit-richard.git specify init <PROJECT_NAME>
 ```
 
 **Benefits of persistent installation:**
