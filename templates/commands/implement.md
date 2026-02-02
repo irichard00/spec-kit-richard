@@ -142,12 +142,17 @@ Parse tasks.md structure and extract:
 
 ### Step 6: Execute Implementation
 
+**⚠️ CRITICAL: CONTINUOUS EXECUTION**
+- **Do NOT pause or ask for user confirmation between phases or checkpoints**
+- **Execute ALL tasks continuously until completion or failure**
+- **Only stop if a blocking error occurs that prevents further progress**
+
 Execute implementation following the task plan:
 - **Phase-by-phase execution**: Complete each phase before moving to the next
 - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
 - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
 - **File-based coordination**: Tasks affecting the same files must run sequentially
-- **Validation checkpoints**: Verify each phase completion before proceeding
+- **Checkpoint commits**: After completing each phase/checkpoint, commit changes to keep commits small and focused (see Step 6a below)
 
 Implementation execution rules:
 - **Setup first**: Initialize project structure, dependencies, configuration
@@ -156,14 +161,34 @@ Implementation execution rules:
 - **Integration work**: Database connections, middleware, logging, external services
 - **Polish and validation**: Unit tests, performance optimization, documentation
 
+#### Step 6a: Checkpoint Commits
+
+After completing each phase (Setup, Foundational, each User Story, Polish), create a checkpoint commit:
+
+1. **Stage changes for this phase**:
+   ```bash
+   git add -A
+   ```
+
+2. **Commit with phase-specific message**:
+   ```bash
+   git commit -m "feat(<folder-name>): complete <phase-name>
+
+   Completed tasks: <list of task IDs completed in this phase>
+
+   Co-Authored-By: Claude <noreply@anthropic.com>"
+   ```
+
+**Note**: Do NOT push after checkpoint commits. Continue immediately to the next phase. Push only happens at the end (Step 9).
+
 ### Step 7: Progress Tracking and Error Handling
 
-- Report progress after each completed task
-- Halt execution if any non-parallel task fails
+- Report progress after each completed task (do NOT wait for user acknowledgment)
+- Halt execution only if a blocking error occurs that prevents further progress
 - For parallel tasks [P], continue with successful tasks, report failed ones
 - Provide clear error messages with context for debugging
-- Suggest next steps if implementation cannot proceed
-- **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+- If a task fails but other tasks can continue, note the failure and proceed
+- **IMPORTANT**: For completed tasks, mark the task off as [X] in the tasks file immediately
 
 ### Step 8: Completion Validation
 
@@ -172,30 +197,33 @@ Implementation execution rules:
 - Validate that tests pass and coverage meets requirements
 - Confirm the implementation follows the technical plan
 
-### Step 9: Commit and Push
+### Step 9: Final Commit and Push
 
-After implementation is complete (or partially complete), commit and push all changes:
+After all phases are complete, commit any remaining changes and push everything to remote:
 
-1. **Stage all changes**:
+1. **Stage any remaining changes**:
    ```bash
    git add -A
    ```
 
-2. **Commit with descriptive message**:
+2. **Commit remaining changes (if any)**:
    ```bash
-   git commit -m "feat(<folder-name>): implement <feature-description>
+   git commit -m "feat(<folder-name>): complete implementation
 
-   Implemented tasks from specs/<folder-name>/tasks.md
+   Completed all tasks from specs/<folder-name>/tasks.md
 
    Co-Authored-By: Claude <noreply@anthropic.com>"
    ```
+   (Skip if nothing to commit - checkpoint commits may have captured everything)
 
-3. **Push to remote**:
+3. **Push all commits to remote**:
    ```bash
    git push -u origin <branch-name>
    ```
 
 **If push fails**: Retry once. If still failing, warn user that changes are committed locally but not pushed.
+
+**Note**: Checkpoint commits from Step 6a are now pushed along with any final commit. This keeps individual commits small and focused.
 
 ### Step 10: Mark Completion Status
 
