@@ -45,7 +45,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 Run `{PREREQ_SCRIPT}` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute. For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
-### Step 2: Check Checklists Status
+### Step 2: Check Checklists Status (Informational Only)
 
 (if FEATURE_DIR/checklists/ exists):
 - Scan all checklist files in the checklists/ directory
@@ -53,30 +53,14 @@ Run `{PREREQ_SCRIPT}` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS li
   - Total items: All lines matching `- [ ]` or `- [X]` or `- [x]`
   - Completed items: Lines matching `- [X]` or `- [x]`
   - Incomplete items: Lines matching `- [ ]`
-- Create a status table:
+- Log a brief status summary (do NOT pause for user input):
 
   ```text
-  | Checklist | Total | Completed | Incomplete | Status |
-  |-----------|-------|-----------|------------|--------|
-  | ux.md     | 12    | 12        | 0          | ✓ PASS |
-  | test.md   | 8     | 5         | 3          | ✗ FAIL |
-  | security.md | 6   | 6         | 0          | ✓ PASS |
+  Checklist status: ux.md (12/12 ✓), test.md (5/8 ⚠), security.md (6/6 ✓)
   ```
 
-- Calculate overall status:
-  - **PASS**: All checklists have 0 incomplete items
-  - **FAIL**: One or more checklists have incomplete items
-
-- **If any checklist is incomplete**:
-  - Display the table with incomplete item counts
-  - **STOP** and ask: "Some checklists are incomplete. Do you want to proceed with implementation anyway? (yes/no)"
-  - Wait for user response before continuing
-  - If user says "no" or "wait" or "stop", halt execution
-  - If user says "yes" or "proceed" or "continue", proceed to step 3
-
-- **If all checklists are complete**:
-  - Display the table showing all checklists passed
-  - Automatically proceed to step 3
+- **Automatically proceed to Step 3** regardless of checklist status
+- Note: Checklists are for manual review at user's discretion, not blocking gates for implementation
 
 ### Step 3: Load Implementation Context
 
@@ -142,10 +126,12 @@ Parse tasks.md structure and extract:
 
 ### Step 6: Execute Implementation
 
-**⚠️ CRITICAL: CONTINUOUS EXECUTION**
+**⚠️ CRITICAL: CONTINUOUS EXECUTION UNTIL 100% COMPLETE**
 - **Do NOT pause or ask for user confirmation between phases or checkpoints**
-- **Execute ALL tasks continuously until completion or failure**
+- **Execute ALL tasks continuously until EVERY SINGLE task is marked [X]**
 - **Only stop if a blocking error occurs that prevents further progress**
+- **"Nearly complete" is NOT complete - keep working until ALL tasks done**
+- **Do NOT proceed to Step 9 (commit/push) until Step 8 verification passes**
 
 Execute implementation following the task plan:
 - **Phase-by-phase execution**: Complete each phase before moving to the next
@@ -190,14 +176,33 @@ After completing each phase (Setup, Foundational, each User Story, Polish), crea
 - If a task fails but other tasks can continue, note the failure and proceed
 - **IMPORTANT**: For completed tasks, mark the task off as [X] in the tasks file immediately
 
-### Step 8: Completion Validation
+### Step 8: Completion Validation (BLOCKING GATE - AUTOMATED)
 
-- Verify all required tasks are completed
-- Check that implemented features match the original specification
-- Validate that tests pass and coverage meets requirements
-- Confirm the implementation follows the technical plan
+**⚠️ CRITICAL: This step is a BLOCKING GATE. Do NOT proceed to Step 9 unless ALL tasks are marked [X].**
+
+1. **Re-read tasks.md** and count task completion status:
+   - Count total tasks: Lines matching `- [ ]` or `- [X]` or `- [x]`
+   - Count completed tasks: Lines matching `- [X]` or `- [x]`
+   - Count incomplete tasks: Lines matching `- [ ]`
+
+2. **Automated verification check** (NO user interaction):
+   ```
+   IF incomplete_tasks > 0:
+       - Log: "Found {N} incomplete tasks. Continuing execution..."
+       - DO NOT proceed to Step 9
+       - Return to Step 6 and continue executing incomplete tasks
+       - Repeat Step 8 after completing more tasks
+
+   IF incomplete_tasks == 0:
+       - Log: "All tasks complete. Proceeding to commit and push..."
+       - Proceed to Step 9
+   ```
+
+**IMPORTANT**: The agent MUST loop between Step 6 → Step 7 → Step 8 until ALL tasks show `[X]`. Only when `incomplete_tasks == 0` can the agent proceed to Step 9. This is fully automated - NO manual validation required.
 
 ### Step 9: Final Commit and Push
+
+**Prerequisite**: Step 8 verification passed (all tasks marked `[X]`).
 
 After all phases are complete, commit any remaining changes and push everything to remote:
 
@@ -227,16 +232,25 @@ After all phases are complete, commit any remaining changes and push everything 
 
 ### Step 10: Mark Completion Status
 
-After commit and push:
+After commit and push, **re-verify completion status** before marking:
 
-**If all tasks completed successfully:**
-1. Run `{MARK_SCRIPT} --folder <folder-name> --status DONE`
-2. Report: "Implementation complete! Folder marked as DONE-<folder-name>"
+1. **Final verification**: Re-read tasks.md one more time and count:
+   - Total tasks with `- [ ]` (incomplete)
+   - Total tasks with `- [X]` or `- [x]` (complete)
 
-**If any task failed:**
-1. Run `{MARK_SCRIPT} --folder <folder-name> --status FAILED`
-2. Report: "Implementation incomplete. Folder marked as FAILED-<folder-name>"
-3. List the failed tasks and suggested next steps
+2. **Determine status based on actual task counts**:
+
+   **If incomplete_tasks == 0 (ALL tasks marked [X]):**
+   - Run `{MARK_SCRIPT} --folder <folder-name> --status DONE`
+   - Report: "Implementation complete! Folder marked as DONE-<folder-name>"
+
+   **If incomplete_tasks > 0 (ANY task still marked [ ]):**
+   - Run `{MARK_SCRIPT} --folder <folder-name> --status FAILED`
+   - Report: "Implementation incomplete. Folder marked as FAILED-<folder-name>"
+   - List the specific incomplete task IDs and descriptions
+   - Suggest: "Run `/rr.implement <folder-name>` again to complete remaining tasks"
+
+**⚠️ NEVER mark as DONE if any task in tasks.md still shows `- [ ]`**
 
 Report final status with:
 - Summary of completed work

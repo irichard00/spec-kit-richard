@@ -10,52 +10,9 @@ function Get-RepoRoot {
     } catch {
         # Git command failed
     }
-    
+
     # Fall back to script location for non-git repos
     return (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
-}
-
-function Get-CurrentBranch {
-    # First check if SPECIFY_FEATURE environment variable is set
-    if ($env:SPECIFY_FEATURE) {
-        return $env:SPECIFY_FEATURE
-    }
-    
-    # Then check git if available
-    try {
-        $result = git rev-parse --abbrev-ref HEAD 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            return $result
-        }
-    } catch {
-        # Git command failed
-    }
-    
-    # For non-git repos, try to find the latest feature directory
-    $repoRoot = Get-RepoRoot
-    $specsDir = Join-Path $repoRoot "specs"
-    
-    if (Test-Path $specsDir) {
-        $latestFeature = ""
-        $highest = 0
-        
-        Get-ChildItem -Path $specsDir -Directory | ForEach-Object {
-            if ($_.Name -match '^(\d{3})-') {
-                $num = [int]$matches[1]
-                if ($num -gt $highest) {
-                    $highest = $num
-                    $latestFeature = $_.Name
-                }
-            }
-        }
-        
-        if ($latestFeature) {
-            return $latestFeature
-        }
-    }
-    
-    # Final fallback
-    return "main"
 }
 
 function Test-HasGit {
@@ -67,40 +24,77 @@ function Test-HasGit {
     }
 }
 
-function Test-FeatureBranch {
-    param(
-        [string]$Branch,
-        [bool]$HasGit = $true
-    )
-    
-    # For non-git repos, we can't enforce branch naming but still provide output
-    if (-not $HasGit) {
-        Write-Warning "[specify] Warning: Git repository not detected; skipped branch validation"
-        return $true
-    }
-    
-    if ($Branch -notmatch '^[0-9]{3}-') {
-        Write-Output "ERROR: Not on a feature branch. Current branch: $Branch"
-        Write-Output "Feature branches should be named like: 001-feature-name"
-        return $false
-    }
-    return $true
-}
-
-function Get-FeatureDir {
-    param([string]$RepoRoot, [string]$Branch)
-    Join-Path $RepoRoot "specs/$Branch"
-}
-
-function Get-FeaturePathsEnv {
+# List all available spec folders in specs/ directory
+# Returns array of folder names
+function Get-SpecFolders {
     $repoRoot = Get-RepoRoot
-    $currentBranch = Get-CurrentBranch
+    $specsDir = Join-Path $repoRoot "specs"
+    $folders = @()
+
+    if (Test-Path $specsDir) {
+        Get-ChildItem -Path $specsDir -Directory | ForEach-Object {
+            if ($_.Name -match '^\d{3}-') {
+                $folders += $_.Name
+            }
+        }
+    }
+
+    return $folders
+}
+
+# List spec folders as JSON array
+function Get-SpecFoldersJson {
+    $folders = Get-SpecFolders
+
+    if ($folders.Count -eq 0) {
+        return "[]"
+    }
+
+    $jsonItems = $folders | ForEach-Object { "`"$_`"" }
+    return "[" + ($jsonItems -join ",") + "]"
+}
+
+# Validate that a spec folder exists
+function Test-SpecFolder {
+    param([string]$FolderName)
+
+    $repoRoot = Get-RepoRoot
+    $targetDir = Join-Path $repoRoot "specs/$FolderName"
+
+    return (Test-Path -Path $targetDir -PathType Container)
+}
+
+# Get feature paths for a specific folder name
+# If no folder provided, returns empty paths with available folders list
+function Get-FeaturePathsEnv {
+    param([string]$FolderName = "")
+
+    $repoRoot = Get-RepoRoot
     $hasGit = Test-HasGit
-    $featureDir = Get-FeatureDir -RepoRoot $repoRoot -Branch $currentBranch
-    
-    [PSCustomObject]@{
+
+    # If no folder specified, return empty paths with available folders
+    if ([string]::IsNullOrEmpty($FolderName)) {
+        $availableFolders = Get-SpecFoldersJson
+
+        return [PSCustomObject]@{
+            REPO_ROOT         = $repoRoot
+            HAS_GIT           = $hasGit
+            FEATURE_DIR       = ""
+            FEATURE_SPEC      = ""
+            IMPL_PLAN         = ""
+            TASKS             = ""
+            RESEARCH          = ""
+            DATA_MODEL        = ""
+            QUICKSTART        = ""
+            CONTRACTS_DIR     = ""
+            AVAILABLE_FOLDERS = $availableFolders
+        }
+    }
+
+    $featureDir = Join-Path $repoRoot "specs/$FolderName"
+
+    return [PSCustomObject]@{
         REPO_ROOT     = $repoRoot
-        CURRENT_BRANCH = $currentBranch
         HAS_GIT       = $hasGit
         FEATURE_DIR   = $featureDir
         FEATURE_SPEC  = Join-Path $featureDir 'spec.md'

@@ -25,11 +25,37 @@ Note: This clarification workflow is expected to run (and be completed) BEFORE i
 
 Execution steps:
 
-1. Run `{SCRIPT}` from repo root **once** (combined `--json --paths-only` mode / `-Json -PathsOnly`). Parse minimal JSON payload fields:
+1. **Determine Target Spec Folder**:
+
+   a. **Check if folder name provided in user input**:
+      - Parse `$ARGUMENTS` for a spec folder name (format: `NNN-feature-name`, e.g., `001-user-auth`)
+      - If found, use that folder name and proceed to step 2
+
+   b. **If no folder name provided, list available folders and prompt user**:
+      - Run `{SCRIPT} --list-folders --json` to get available spec folders
+      - If no folders exist, ERROR: "No spec folders found. Run /rr.specify first to create a feature specification."
+      - If exactly one folder exists, use it automatically and inform the user
+      - If multiple folders exist, present the list and ask user to specify which one:
+
+        ```markdown
+        Multiple spec folders found. Which one would you like to clarify?
+
+        | # | Folder Name |
+        |---|-------------|
+        | 1 | 001-user-auth |
+        | 2 | 002-payment-flow |
+        | ... | ... |
+
+        Please reply with the folder name (e.g., `001-user-auth`) or the number.
+        ```
+
+      - Wait for user response before proceeding
+
+2. Run `{SCRIPT} --json --paths-only <folder-name>` from repo root **once**. Parse minimal JSON payload fields:
    - `FEATURE_DIR`
    - `FEATURE_SPEC`
    - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
-   - If JSON parsing fails, abort and instruct user to re-run `/rr.specify` or verify feature branch environment.
+   - If JSON parsing fails, abort and instruct user to re-run `/rr.specify` or verify the spec folder exists.
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot").
 
 2. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
