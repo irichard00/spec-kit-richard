@@ -7,6 +7,11 @@ All notable changes to the Specify CLI and templates are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.24] - 2026-02-18
+ 
+- Updated /rr.implement_all to use stacked branching (Folder 2 branches from Folder 1), preserving code dependencies across batched implementations.
+- Updated `start-implementation` scripts to support `--from-current-branch` flag.
+
 ## [0.0.23] - 2026-02-17
  
 - Harmonized /rr.implement and /rr.implement_all commands to ensure robust phase completion and end-to-end workflow (commit, push, PR creation).

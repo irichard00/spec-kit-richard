@@ -64,7 +64,9 @@ For each folder in FOLDERS array (in order):
 #### 4.1: Initialize Implementation
 
 1. Display: "Processing folder N of M: <folder-name>"
-2. Run `{START_SCRIPT} --folder <folder>` to create/checkout branch
+2. Run `{START_SCRIPT} --folder <folder> --from-current-branch` to create new branch from CURRENT HEAD
+   - **Important**: This creates a stacked branch dependency (Folder 1 -> Folder 2 -> Folder 3)
+   - This ensures Folder 2 has access to code written in Folder 1
 3. Parse BRANCH_NAME and FEATURE_DIR from response
 
 #### 4.2: Run Implementation Workflow
@@ -145,12 +147,10 @@ Execute the full implementation workflow (same as `/rr.implement`):
    - If "no": Report current status and exit batch processing
    - If "yes": Continue to next folder
 
-#### 4.4: Return to Starting Branch
-
-After each folder (success or failure):
-```bash
-git checkout <STARTING_BRANCH>
-```
+#### 4.4: Prepare for Next Folder
+ 
+- Do **NOT** checkout the starting branch. 
+- Stay on the current branch so the next folder branches off this one (Stacking).
 
 ### Step 5: Final Report
 

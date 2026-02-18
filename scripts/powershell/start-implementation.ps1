@@ -3,7 +3,8 @@
 param(
     [string]$Folder,
     [switch]$Json,
-    [switch]$Help
+    [switch]$Help,
+    [switch]$FromCurrentBranch
 )
 
 if ($Help) {
@@ -14,6 +15,7 @@ if ($Help) {
     Write-Host "Options:"
     Write-Host "  -Folder <name>  The spec folder name (required)"
     Write-Host "  -Json           Output in JSON format"
+    Write-Host "  -FromCurrentBranch Create branch from current HEAD (stacking)"
     Write-Host "  -Help           Show this help message"
     Write-Host ""
     Write-Host "Example:"
@@ -66,9 +68,28 @@ if ($HasGit) {
         git checkout $BranchName
         Write-Host "[implement] Switched to existing branch: $BranchName" -ForegroundColor Yellow
     } else {
+    } else {
+        # Determine base branch
+        $BaseRef = ""
+        $BaseMsg = ""
+        
+        if ($FromCurrentBranch) {
+            $BaseRef = "HEAD"
+            $BaseMsg = "current branch"
+        } else {
+            # Default to main if it exists, otherwise master
+            $MainExists = git show-ref --verify --quiet refs/heads/main
+            if ($LASTEXITCODE -eq 0) {
+                $BaseRef = "main"
+            } else {
+                $BaseRef = "master"
+            }
+            $BaseMsg = $BaseRef
+        }
+
         # Create new branch
-        git checkout -b $BranchName
-        Write-Host "[implement] Created and switched to branch: $BranchName" -ForegroundColor Green
+        git checkout -b $BranchName $BaseRef
+        Write-Host "[implement] Created branch $BranchName from $BaseMsg" -ForegroundColor Green
     }
 } else {
     Write-Host "[implement] Warning: Git repository not detected; skipped branch creation for $BranchName" -ForegroundColor Yellow

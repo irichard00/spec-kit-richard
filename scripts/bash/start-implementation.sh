@@ -5,6 +5,7 @@ set -e
 
 FOLDER_NAME=""
 JSON_MODE=false
+FROM_CURRENT_BRANCH=false
 
 # Parse arguments
 i=1
@@ -22,15 +23,19 @@ while [ $i -le $# ]; do
             fi
             FOLDER_NAME="${!i}"
             ;;
+        --from-current-branch)
+            FROM_CURRENT_BRANCH=true
+            ;;
         --help|-h)
             echo "Usage: $0 --folder <folder-name> [--json]"
             echo ""
             echo "Creates a git branch for the selected spec folder."
             echo ""
             echo "Options:"
-            echo "  --folder <name>  The spec folder name (required)"
-            echo "  --json           Output in JSON format"
-            echo "  --help           Show this help message"
+            echo "  --folder <name>      The spec folder name (required)"
+            echo "  --json               Output in JSON format"
+            echo "  --from-current-branch Create branch from current HEAD (stacking)"
+            echo "  --help               Show this help message"
             echo ""
             echo "Example:"
             echo "  $0 --folder 001-user-auth --json"
@@ -80,9 +85,23 @@ if [ "$HAS_GIT" = true ]; then
         git checkout "$BRANCH_NAME"
         >&2 echo "[implement] Switched to existing branch: $BRANCH_NAME"
     else
+        # Determine base branch
+        if [ "$FROM_CURRENT_BRANCH" = true ]; then
+            BASE_REF="HEAD"
+            BASE_MSG="current branch"
+        else
+            # Default to main if it exists, otherwise master
+            if git show-ref --verify --quiet refs/heads/main; then
+                BASE_REF="main"
+            else
+                BASE_REF="master"
+            fi
+            BASE_MSG="$BASE_REF"
+        fi
+
         # Create new branch
-        git checkout -b "$BRANCH_NAME"
-        >&2 echo "[implement] Created and switched to branch: $BRANCH_NAME"
+        git checkout -b "$BRANCH_NAME" "$BASE_REF"
+        >&2 echo "[implement] Created branch $BRANCH_NAME from $BASE_MSG"
     fi
 else
     >&2 echo "[implement] Warning: Git repository not detected; skipped branch creation for $BRANCH_NAME"
