@@ -129,23 +129,23 @@ Parse tasks.md structure and extract:
 **⚠️ CRITICAL: CONTINUOUS EXECUTION UNTIL 100% COMPLETE**
 - **Do NOT pause or ask for user confirmation between phases or checkpoints**
 - **Execute ALL tasks continuously until EVERY SINGLE task is marked [X]**
-- **Only stop if a blocking error occurs that prevents further progress**
-- **"Nearly complete" is NOT complete - keep working until ALL tasks done**
+- **Nearly complete" is NOT complete - keep working until ALL tasks done, including Polish and Verification phases**
 - **Do NOT proceed to Step 9 (commit/push) until Step 8 verification passes**
 
 Execute implementation following the task plan:
 - **Phase-by-phase execution**: Complete each phase before moving to the next
 - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
 - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
+- **Unit Test Consistency**: Run project unit tests frequently to ensure no regressions
 - **File-based coordination**: Tasks affecting the same files must run sequentially
 - **Checkpoint commits**: After completing each phase/checkpoint, commit changes to keep commits small and focused (see Step 6a below)
 
 Implementation execution rules:
 - **Setup first**: Initialize project structure, dependencies, configuration
 - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
-- **Core development**: Implement models, services, CLI commands, endpoints
+- **Core development**: Implement models, services, CLI commands, endpoints. **Update/Pass related unit tests.**
 - **Integration work**: Database connections, middleware, logging, external services
-- **Polish and validation**: Unit tests, performance optimization, documentation
+- **Polish and validation**: Unit tests, performance optimization, documentation. **Final unit test suite run.**
 
 #### Step 6a: Checkpoint Commits
 
@@ -229,6 +229,23 @@ After all phases are complete, commit any remaining changes and push everything 
 **If push fails**: Retry once. If still failing, warn user that changes are committed locally but not pushed.
 
 **Note**: Checkpoint commits from Step 6a are now pushed along with any final commit. This keeps individual commits small and focused.
+
+### Step 9.1: Create Pull Request (END-TO-END)
+
+**Prerequisite**: All changes pushed to remote (Step 9).
+
+1. **Verify `gh` CLI availability**:
+   ```bash
+   gh --version 2>/dev/null
+   ```
+
+2. **Create Pull Request**:
+   If `gh` is available:
+   ```bash
+   gh pr create --title "feat(<folder-name>): complete implementation" --body "Implemented all tasks from specs/<folder-name>/tasks.md. Includes Setup, Foundational, User Stories, and Polish phases."
+   ```
+   If `gh` is NOT available:
+   Log a message: "Pull Request cannot be created automatically (`gh` CLI missing). Please create PR manually at the remote URL."
 
 ### Step 10: Mark Completion Status
 

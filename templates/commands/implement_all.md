@@ -76,8 +76,17 @@ Execute the full implementation workflow (same as `/rr.implement`):
 3. **Load Context**: Read tasks.md, plan.md, and other available documents
 4. **Project Setup**: Verify/create ignore files
 5. **Parse Tasks**: Extract phases, dependencies, and execution order
-6. **Execute Tasks**: Run all tasks phase-by-phase
-7. **Track Progress**: Mark tasks as [X] when complete
+7. **Execute Tasks**: Run all tasks phase-by-phase
+    - **⚠️ CRITICAL: CONTINUOUS EXECUTION UNTIL 100% COMPLETE**
+    - Do NOT pause or ask for user confirmation between phases or checkpoints
+    - Execute ALL tasks continuously until EVERY SINGLE task is marked [X]
+    - **Unit Test Focus**: Run and pass all related unit tests frequently during implementation
+    - **Nearly complete" is NOT complete - keep working until ALL tasks done, including Polish and Verification phases**
+8. **Track Progress**: Mark tasks as [X] when complete
+9. **Completion Validation (BLOCKING GATE - AUTOMATED)**:
+    - Re-read tasks.md and count task completion status
+    - IF incomplete_tasks > 0: Log message, loop back to executing incomplete tasks
+    - IF incomplete_tasks == 0: Proceed to commit and push
 
 #### 4.3: Handle Completion
 
@@ -102,8 +111,16 @@ Execute the full implementation workflow (same as `/rr.implement`):
    git push -u origin <branch-name>
    ```
 
-4. Run `{MARK_SCRIPT} --folder <folder> --status DONE`
-5. Log: "✓ <folder-name>: Implementation complete, pushed to origin/<branch-name>"
+4. **Create Pull Request (END-TO-END)**:
+   - Verify `gh` CLI availability: `gh --version 2>/dev/null`
+   - If `gh` is available:
+     ```bash
+     gh pr create --title "feat(<folder-name>): complete implementation" --body "Implemented all tasks from specs/<folder-name>/tasks.md. Includes Setup, Foundational, User Stories, and Polish phases."
+     ```
+   - If `gh` is NOT available: Log message "Pull Request cannot be created automatically (`gh` CLI missing)."
+
+5. Run `{MARK_SCRIPT} --folder <folder> --status DONE`
+6. Log: "✓ <folder-name>: Implementation complete, PR created (or skipped), pushed to origin/<branch-name>"
 
 **If any task failed:**
 

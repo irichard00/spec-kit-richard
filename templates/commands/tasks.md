@@ -161,6 +161,7 @@ Every task MUST strictly follow this format:
 - **Phase 1**: Setup (project initialization)
 - **Phase 2**: Foundational (blocking prerequisites - MUST complete before user stories)
 - **Phase 3+**: User Stories in priority order (P1, P2, P3...)
-  - Within each story: Tests (if requested) → Models → Services → Endpoints → Integration
+  - Within each story: **Existing Unit Tests Update** → **New Unit Tests** (if requested) → Models → Services → Endpoints → Integration
+  - **Prerequisite**: All related unit tests MUST pass before a story is considered complete.
   - Each phase should be a complete, independently testable increment
 - **Final Phase**: Polish & Cross-Cutting Concerns

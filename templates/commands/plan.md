@@ -58,6 +58,8 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 3. **Execute plan workflow**: Follow the structure in IMPL_PLAN template to:
    - Fill Technical Context (mark unknowns as "NEEDS CLARIFICATION")
+   - **Identify existing unit tests**: Scan the codebase for related unit tests that need updating.
+   - **Plan for new unit tests**: Define testing strategy for new features (unit, integration, contract).
    - Fill Constitution Check section from constitution
    - Evaluate gates (ERROR if violations unjustified)
    - Phase 0: Generate research.md (resolve all NEEDS CLARIFICATION)
@@ -92,11 +94,16 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 **Output**: research.md with all NEEDS CLARIFICATION resolved
 
-### Phase 1: Design & Contracts
+### Phase 1: Design, Contracts & Testing Strategy
 
 **Prerequisites:** `research.md` complete
 
-1. **Extract entities from feature spec** → `data-model.md`:
+1. **Define Testing Strategy**:
+   - **Identify Test Targets**: List specific functions, classes, and components requiring unit tests.
+   - **Setup Test Environment**: If not already present, plan for test database/mocks/framework configuration.
+   - **Define Pass Criteria**: Ensure all new and updated unit tests pass as part of the implementation.
+
+2. **Extract entities from feature spec** → `data-model.md`:
    - Entity name, fields, relationships
    - Validation rules from requirements
    - State transitions if applicable
