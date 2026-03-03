@@ -116,9 +116,13 @@ Execute the full implementation workflow (same as `/rr.implement`):
 4. **Create Pull Request (END-TO-END)**:
    - Verify `gh` CLI availability: `gh --version 2>/dev/null`
    - If `gh` is available:
-     ```bash
-     gh pr create --title "feat(<folder-name>): complete implementation" --body "Implemented all tasks from specs/<folder-name>/tasks.md. Includes Setup, Foundational, User Stories, and Polish phases."
-     ```
+     - Read `tasks.md` and extract the list of completed tasks for this folder.
+     - Generate a comprehensive PR description detailing the finished coding items and their summaries.
+     - Save this description to `specs/<folder-name>/pr_body.md`.
+     - Execute the PR creation:
+       ```bash
+       gh pr create --title "feat(<folder-name>): complete implementation" --body-file specs/<folder-name>/pr_body.md
+       ```
    - If `gh` is NOT available: Log message "Pull Request cannot be created automatically (`gh` CLI missing)."
 
 5. Run `{MARK_SCRIPT} --folder <folder> --status DONE`

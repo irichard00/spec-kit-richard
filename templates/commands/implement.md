@@ -239,11 +239,15 @@ After all phases are complete, commit any remaining changes and push everything 
    gh --version 2>/dev/null
    ```
 
-2. **Create Pull Request**:
+2. **Generate PR Description & Create Pull Request**:
    If `gh` is available:
-   ```bash
-   gh pr create --title "feat(<folder-name>): complete implementation" --body "Implemented all tasks from specs/<folder-name>/tasks.md. Includes Setup, Foundational, User Stories, and Polish phases."
-   ```
+   - Read `tasks.md` and extract the list of completed tasks.
+   - Generate a comprehensive PR description detailing the finished coding items and their summaries.
+   - Save this description to a file `specs/<folder-name>/pr_body.md`.
+   - Execute the PR creation:
+     ```bash
+     gh pr create --title "feat(<folder-name>): complete implementation" --body-file specs/<folder-name>/pr_body.md
+     ```
    If `gh` is NOT available:
    Log a message: "Pull Request cannot be created automatically (`gh` CLI missing). Please create PR manually at the remote URL."
 
