@@ -69,6 +69,14 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T008 Configure error handling and logging infrastructure
 - [ ] T009 Setup environment configuration management
 
+### Wiring & Registration (REQUIRED)
+
+**Purpose**: Ensure new components are fully integrated into the existing application structure.
+
+- [ ] T010 [P] Update Global Factories to include new components
+- [ ] T011 [P] Register new interfaces in DI Containers
+- [ ] T012 [P] Update routing configurations for new entry points
+
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
 ---

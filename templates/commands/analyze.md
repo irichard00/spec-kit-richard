@@ -132,6 +132,7 @@ Focus on high-signal findings. Limit to 50 findings total; aggregate remainder i
 - Requirements with zero associated tasks
 - Tasks with no mapped requirement/story
 - Non-functional requirements not reflected in tasks (e.g., performance, security)
+- **Dangling Components**: New files/components defined in plan.md or tasks.md that lack a corresponding task to wire or register them into existing application entry points.
 
 #### F. Inconsistency
 

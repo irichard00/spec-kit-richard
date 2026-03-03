@@ -88,6 +88,7 @@ Execution steps:
    - External services/APIs and failure modes
    - Data import/export formats
    - Protocol/versioning assumptions
+   - Internal Wiring/Registration (How and where new components plug into existing factories, routers, or DI containers)
 
    Edge Cases & Failure Handling:
    - Negative scenarios

@@ -286,14 +286,19 @@ TEMPLATE="$REPO_ROOT/.specify/templates/spec-template.md"
 SPEC_FILE="$FEATURE_DIR/spec.md"
 if [ -f "$TEMPLATE" ]; then cp "$TEMPLATE" "$SPEC_FILE"; else touch "$SPEC_FILE"; fi
 
+PLAN_TEMPLATE="$REPO_ROOT/.specify/templates/plan-template.md"
+PLAN_FILE="$FEATURE_DIR/plan.md"
+if [ -f "$PLAN_TEMPLATE" ]; then cp "$PLAN_TEMPLATE" "$PLAN_FILE"; else touch "$PLAN_FILE"; fi
+
 # Set the SPECIFY_FEATURE environment variable for the current session
 export SPECIFY_FEATURE="$BRANCH_NAME"
 
 if $JSON_MODE; then
-    printf '{"FOLDER_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+    printf '{"FOLDER_NAME":"%s","SPEC_FILE":"%s","IMPL_PLAN":"%s","FEATURE_NUM":"%s"}\n' "$BRANCH_NAME" "$SPEC_FILE" "$PLAN_FILE" "$FEATURE_NUM"
 else
     echo "FOLDER_NAME: $BRANCH_NAME"
     echo "SPEC_FILE: $SPEC_FILE"
+    echo "IMPL_PLAN: $PLAN_FILE"
     echo "FEATURE_NUM: $FEATURE_NUM"
     echo ""
     echo "Next step: Run /rr.implement to create branch and start implementation."

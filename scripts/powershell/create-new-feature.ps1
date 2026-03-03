@@ -260,6 +260,14 @@ if (Test-Path $template) {
     New-Item -ItemType File -Path $specFile | Out-Null 
 }
 
+$planTemplate = Join-Path $repoRoot '.specify/templates/plan-template.md'
+$planFile = Join-Path $featureDir 'plan.md'
+if (Test-Path $planTemplate) { 
+    Copy-Item $planTemplate $planFile -Force 
+} else { 
+    New-Item -ItemType File -Path $planFile | Out-Null 
+}
+
 # Set the SPECIFY_FEATURE environment variable for the current session
 $env:SPECIFY_FEATURE = $branchName
 
@@ -267,12 +275,14 @@ if ($Json) {
     $obj = [PSCustomObject]@{
         FOLDER_NAME = $branchName
         SPEC_FILE = $specFile
+        IMPL_PLAN = $planFile
         FEATURE_NUM = $featureNum
     }
     $obj | ConvertTo-Json -Compress
 } else {
     Write-Output "FOLDER_NAME: $branchName"
     Write-Output "SPEC_FILE: $specFile"
+    Write-Output "IMPL_PLAN: $planFile"
     Write-Output "FEATURE_NUM: $featureNum"
     Write-Output ""
     Write-Output "Next step: Run /rr.implement to create branch and start implementation."

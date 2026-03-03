@@ -1,5 +1,7 @@
 # [PROJECT NAME] Development Guidelines
 
+**Core Integration Rule**: CRITICAL: Every new component implementation must include a task to 'wire/register' it into the application entry points. Never leave a component 'dangling'.
+
 Auto-generated from all feature plans. Last updated: [DATE]
 
 ## Active Technologies
