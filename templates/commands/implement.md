@@ -251,6 +251,43 @@ After all phases are complete, commit any remaining changes and push everything 
    If `gh` is NOT available:
    Log a message: "Pull Request cannot be created automatically (`gh` CLI missing). Please create PR manually at the remote URL."
 
+### Step 9.2: Self Code Review and Auto-Fix
+
+**Prerequisite**: PR was successfully created in Step 9.1.
+
+1. **Perform Code Review**:
+   - Critically review the code changes you just made in this PR.
+   - Look for potential bugs, edge cases, performance issues, readability, or adherence to best practices.
+   - Write down your feedback and findings.
+
+2. **Auto-Fix based on Feedback**:
+   - If your review identifies any issues or improvements, immediately implement the fixes in the codebase.
+   - If no issues are found, log "Code review passed with no issues." and skip to Step 10.
+
+3. **Commit and Push Fixes**:
+   If fixes were made:
+   - Stage the changes:
+     ```bash
+     git add -A
+     ```
+   - Commit with a detailed message explaining the review feedback and what was fixed:
+     ```bash
+     git commit -m "fix(<folder-name>): address self-review feedback
+
+     Review Feedback:
+     <summarize the feedback from step 1>
+
+     Fixes Applied:
+     <explain what was actually fixed>
+
+     Co-Authored-By: Claude <noreply@anthropic.com>"
+     ```
+   - Push the new commit to remote:
+     ```bash
+     git push origin <branch-name>
+     ```
+   - If push fails, retry once.
+
 ### Step 10: Mark Completion Status
 
 After commit and push, **re-verify completion status** before marking:

@@ -125,8 +125,25 @@ Execute the full implementation workflow (same as `/rr.implement`):
        ```
    - If `gh` is NOT available: Log message "Pull Request cannot be created automatically (`gh` CLI missing)."
 
-5. Run `{MARK_SCRIPT} --folder <folder> --status DONE`
-6. Log: "✓ <folder-name>: Implementation complete, PR created (or skipped), pushed to origin/<branch-name>"
+5. **Self Code Review and Auto-Fix**:
+   - If the PR was created successfully, immediately perform a code review on the changes for this folder.
+   - Identify any potential bugs, edge cases, readability, or best practice issues.
+   - If improvements are found, immediately implement the fixes in the codebase.
+   - If fixes are made, commit and push them BEFORE moving to the next folder:
+     ```bash
+     git add -A
+     git commit -m "fix(<folder-name>): address self-review feedback
+
+     Review Feedback: <summarize the feedback>
+     Fixes Applied: <explain what was actually fixed>
+
+     Co-Authored-By: Claude <noreply@anthropic.com>"
+     git push origin <branch-name>
+     ```
+   - If no issues found, log "Code review passed with no issues."
+
+6. Run `{MARK_SCRIPT} --folder <folder> --status DONE`
+7. Log: "✓ <folder-name>: Implementation complete, PR created (and reviewed), pushed to origin/<branch-name>"
 
 **If any task failed:**
 
